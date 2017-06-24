@@ -19,7 +19,7 @@ namespace Luky_Cviceni
         public int PriorityModifier { get; set; }
 
         public AttackEffect Effect { get; set; }
-        public AttackType Type { get; set; }
+      
         public bool IsPassive { get; set; }
 
         private double StrengthModifier { get; set; }
@@ -45,7 +45,7 @@ namespace Luky_Cviceni
         /// <param name="cooldown">amount of rounds until it can be used again</param>
         /// <param name="priority">priority number for AI</param>
         /// <param name="priorityModifier">Ai priority modifier</param>
-        public Abillity(string name, string description,double strengthModifier, double dexterityModifier,double enduranceModifier,double intelectModifier,double spirtiModifier,AttackType attackType,AttackEffect attackEffect,int duration, double cost,int cooldown,bool isPassive=false,int priority=0,int priorityModifier=0)
+        public Abillity(string name, string description,double strengthModifier, double dexterityModifier,double enduranceModifier,double intelectModifier,double spirtiModifier,AttackEffect attackEffect,int duration, double cost,int cooldown,bool isPassive=false,int priority=0,int priorityModifier=0)
         {
             this.CurrentCooldown = 0;
             this.Name = name;
@@ -55,7 +55,7 @@ namespace Luky_Cviceni
             this.EnduranceModifier = enduranceModifier;
             this.IntellectModifier = intelectModifier;
             this.SpiritModifier = spirtiModifier;
-            this.Type = attackType;
+           
             this.Effect = attackEffect;
             this.AbillityDuration = duration;
             this.ResourceCost = cost;

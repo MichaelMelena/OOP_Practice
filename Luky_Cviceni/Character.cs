@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Luky_Cviceni
 {
     enum AttackEffect { Blind, Stun, Debuff, Buff, Silence, Heal, None }
-    enum AttackType { Physical,Magical}
+   
     /// <summary>
     /// Abstract class intended to be inherited
     /// </summary>
@@ -32,17 +32,19 @@ namespace Luky_Cviceni
         protected double MaximumHitPoints { get; set; }
         protected double CurrentStamina { get; set; }
         protected double MaximumStamina { get; set; }
-        protected double CurrentMana { get; set; }
-        protected double MaximumMana { get; set; }
+
+        
         protected double PhysicalAttackPower { get; set; }
         protected double PhysicalDefensePower { get; set; }
-        protected double MagicalAttackPower { get; set; }
-        protected double MagicalDefensePower { get; set; }
+
+        
+
         protected double Initiative { get; set; }
         protected double PhysicalAttackModifier { get; set; }
         protected double physicalDefenseModifier { get; set; }
-        protected double MagicalAttackModifier { get; set; }
-        protected double MagicalDefenseModifier { get; set; }
+
+       
+
         protected SpiritEffect CurrentSpiritEffect { get; set; }
 
         //proměné effektů
@@ -60,7 +62,7 @@ namespace Luky_Cviceni
         protected int HealDuration { get; set; }
 
         protected Abillity[] PhysicalAbillities { get; set; }
-        protected Abillity[] MagicalAbillities { get; set; }
+     
 
         //Konstructory
         public Character()
@@ -78,8 +80,7 @@ namespace Luky_Cviceni
             CalculateMaximumStamina();
             CalculatePhysicalAttackPower();
             CalculatePhysicalDefensePower();
-            CalculateMagicalAttackPower();
-            CalculateMagicalDefensePower();
+          
             CalculateInitiative();
             CalculateSpirtiEffect();
         }
@@ -96,16 +97,7 @@ namespace Luky_Cviceni
 
             }
 
-            foreach (Abillity abillity in MagicalAbillities)
-            {
-
-
-                if (abillity.CurrentCooldown == 0 && abillity.ResourceCost <= CurrentMana && IsSilenced == false)
-                    abillity.Usable = true;
-                else
-                    abillity.Usable = false;
-
-            }
+          
 
 
         }
@@ -120,15 +112,7 @@ namespace Luky_Cviceni
                 }
             }
             DoLine();
-            Console.WriteLine("Magical abillities");
-            for (int i = 0; i < MagicalAbillities.Length; i++)
-            {
-                if (MagicalAbillities[i].Usable)
-                {
-                    Console.WriteLine(i + ": " + AbillityInfoPrint(MagicalAbillities[i]));
-                }
-            }
-            DoLine();
+          
         }
         protected void DoLine()
         {
@@ -158,10 +142,7 @@ namespace Luky_Cviceni
         {
             MaximumStamina = this.Endurance * 1 + this.Dexterity * 1 + this.Strength * 1;
         }
-        protected virtual void CalculateMaximumMana()
-        {
-            MaximumMana = this.Intellect * 1 + this.Dexterity * 1;
-        }
+       
         protected virtual void CalculatePhysicalAttackPower()
         {
             PhysicalAttackPower = this.Strength * 1 + this.Dexterity * 1;
@@ -170,24 +151,18 @@ namespace Luky_Cviceni
         {
             PhysicalDefensePower = this.Endurance * 1 + this.Dexterity * 1;
         }
-        protected virtual void CalculateMagicalAttackPower()
-        {
-            MagicalAttackPower = this.Intellect * 1 + this.Spirit * 1;
-        }
-        protected virtual void CalculateMagicalDefensePower()
-        {
-            MagicalDefensePower = this.Intellect * 1 + this.Endurance * 1 + this.Spirit * 1;
-        }
+       
+       
         protected virtual void CalculateInitiative()
         {
             Initiative = this.Dexterity * 1 + this.Intellect * 1 + this.Spirit * 1;
         }
         protected virtual void CalculateSpirtiEffect()
         {
-            if (this.MaximumStamina == this.MaximumMana || this.MaximumStamina > this.MaximumMana)
+            /*if (this.MaximumStamina == this.MaximumMana || this.MaximumStamina > this.MaximumMana)
                 this.CurrentSpiritEffect = SpiritEffect.Staminapool;
             else
-                this.CurrentSpiritEffect = SpiritEffect.Manapool;
+                this.CurrentSpiritEffect = SpiritEffect.Manapool;*/
         }
 
 
@@ -201,15 +176,7 @@ namespace Luky_Cviceni
             }
         }
 
-        public event EventHandler<AttackEventArgs> MagicalAttack;
-        protected virtual void MagicalAttacking(AttackEventArgs args)
-        {
-            if (MagicalAttack != null)
-            {
-                MagicalAttack(this, args);
-            }
-        }
-
+     
         public event EventHandler<PointsEventArgs> CurrentHitPointsChange;
         protected virtual void CurrentHitPointsChanging(PointsEventArgs args)
         {
@@ -228,14 +195,7 @@ namespace Luky_Cviceni
             }
         }
 
-        public event EventHandler<PointsEventArgs> CurrentManaChange;
-        protected virtual void CurrentManaChanging(PointsEventArgs args)
-        {
-            if (CurrentManaChange != null)
-            {
-                CurrentManaChange(this, args);
-            }
-        }
+       
 
         public event EventHandler Blind;
         protected virtual void Blinded()
@@ -301,10 +261,7 @@ namespace Luky_Cviceni
         {
 
         }
-        public virtual void OnMagicalAttack(object source, AttackEventArgs e)
-        {
-
-        }
+       
         public virtual void OnCurrentHitPointsChange(object source, PointsEventArgs e)
         {
 
@@ -313,10 +270,7 @@ namespace Luky_Cviceni
         {
 
         }
-        public virtual void OnCurrentManaChange(object source, PointsEventArgs e)
-        {
-
-        }
+      
         public virtual void OnBlind(object source, EventArgs e)
         {
 
