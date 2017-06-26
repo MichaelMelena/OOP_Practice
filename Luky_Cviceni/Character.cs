@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Luky_Cviceni
 {
     enum AttackEffect { Blind, Stun, Debuff, Buff, Silence, Heal, None }
-   
+
     /// <summary>
     /// Abstract class intended to be inherited
     /// </summary>
@@ -18,7 +18,7 @@ namespace Luky_Cviceni
         public int SkillPoints { get; set; }
         //Druhy útoků
 
-        public enum SpiritEffect { Staminapool, Manapool }
+        public enum SpiritEffect { Health, Stamina }
 
         //Atributy ze ,kterých se počítají staty
         protected double Strength { get; set; }
@@ -33,17 +33,17 @@ namespace Luky_Cviceni
         protected double CurrentStamina { get; set; }
         protected double MaximumStamina { get; set; }
 
-        
-        protected double PhysicalAttackPower { get; set; }
-        protected double PhysicalDefensePower { get; set; }
 
-        
+        protected double AttackPower { get; set; }
+        protected double DefensePower { get; set; }
+
+
 
         protected double Initiative { get; set; }
-        protected double PhysicalAttackModifier { get; set; }
-        protected double physicalDefenseModifier { get; set; }
+        protected double AttackModifier { get; set; }
+        protected double DefenseModifier { get; set; }
 
-       
+
 
         protected SpiritEffect CurrentSpiritEffect { get; set; }
 
@@ -61,14 +61,10 @@ namespace Luky_Cviceni
         protected bool IsHealed { get; set; }
         protected int HealDuration { get; set; }
 
-        protected Abillity[] PhysicalAbillities { get; set; }
-     
+        protected Abillity[] Abillities { get; set; }
 
-        //Konstructory
-        public Character()
-        {
 
-        }
+
 
         /// <summary>
         /// Calculates all the attributes
@@ -78,120 +74,120 @@ namespace Luky_Cviceni
             CalculateMaximumHitPoints();
             CalculateMaximumStamina();
             CalculateMaximumStamina();
-            CalculatePhysicalAttackPower();
-            CalculatePhysicalDefensePower();
-          
+            CalculateAttackPower();
+            CalculateDefensePower();
+
             CalculateInitiative();
-            CalculateSpirtiEffect();
+            DecideSpirtiEffect();
         }
+
+        /// <summary>
+        /// Checks if abillities meet the criteria to be used
+        /// </summary>
         protected void CheckAbillities()
         {
-            foreach (Abillity abillity in PhysicalAbillities)
+            foreach (Abillity abillity in Abillities)
             {
 
 
-                if (abillity.CurrentCooldown == 0 && abillity.ResourceCost <= CurrentStamina && IsBlinded == false)
+                if (abillity.CurrentCooldown == 0 && abillity.StaminaCost <= CurrentStamina && abillity.HealthCost < CurrentHitPoints && IsSilenced == false)
                     abillity.Usable = true;
                 else
                     abillity.Usable = false;
 
             }
 
-          
-
-
         }
-        protected void OfferAbillities()// tohle se da predelat pomoci linq
-        {
-            Console.WriteLine("Physical abillities");
-            for (int i = 0; i < PhysicalAbillities.Length; i++)
-            {
-                if (PhysicalAbillities[i].Usable)
-                {
-                    Console.WriteLine(i+": "+AbillityInfoPrint(PhysicalAbillities[i]));
-                }
-            }
-            DoLine();
-          
-        }
+
+        /// <summary>
+        /// Does a line to separate block of text in console
+        /// </summary>
         protected void DoLine()
         {
             Console.WriteLine("--------------------------------------------------------");
         }
-        protected virtual void ChooseAction()
-        {
-            string chosenOption = " ";
-            while (chosenOption.ToUpper() != "Q")
-            {
-                OfferAbillities();
-                Console.WriteLine("Choose a attack or type Q to skip your turn");
-            }
-            
-        }
 
-        protected string AbillityInfoPrint(Abillity abillity)
-        {
-            return string.Format("{0} === {1}  Cost: {2} Effect: {3} Duration: {4} Cooldown: {5}", abillity.Name.ToUpper(),abillity.Description,abillity.ResourceCost,abillity.Effect,abillity.AbillityDuration,abillity.Cooldown);
-        }
+
+
         //Virtuální metody ,které je možno přepsat
+        /// <summary>
+        /// Contains fromula for calcutaing maximum HP
+        /// </summary>
         protected virtual void CalculateMaximumHitPoints()
         {
             MaximumHitPoints = this.Endurance * 1 + this.Strength * 1;
         }
+        /// <summary>
+        /// Contains fromula for calcutaing maximum Stamina
+        /// </summary>
         protected virtual void CalculateMaximumStamina()
         {
             MaximumStamina = this.Endurance * 1 + this.Dexterity * 1 + this.Strength * 1;
         }
-       
-        protected virtual void CalculatePhysicalAttackPower()
+        /// <summary>
+        /// Contains fromula for calcutaing attack power
+        /// </summary>
+        protected virtual void CalculateAttackPower()
         {
-            PhysicalAttackPower = this.Strength * 1 + this.Dexterity * 1;
+            AttackPower = this.Strength * 1 + this.Dexterity * 1;
         }
-        protected virtual void CalculatePhysicalDefensePower()
+        /// <summary>
+        /// Contains fromula for calcutaing defense power
+        /// </summary>
+        protected virtual void CalculateDefensePower()
         {
-            PhysicalDefensePower = this.Endurance * 1 + this.Dexterity * 1;
+            DefensePower = this.Endurance * 1 + this.Dexterity * 1;
         }
-       
-       
+        /// <summary>
+        /// Contains fromula for calcutaing initiative
+        /// </summary>
         protected virtual void CalculateInitiative()
         {
             Initiative = this.Dexterity * 1 + this.Intellect * 1 + this.Spirit * 1;
         }
-        protected virtual void CalculateSpirtiEffect()
+
+        /// <summary>
+        /// Decides which stat will we renewed each round-- health/stamina regeneration 
+        /// </summary>
+        protected virtual void DecideSpirtiEffect()
         {
-            /*if (this.MaximumStamina == this.MaximumMana || this.MaximumStamina > this.MaximumMana)
-                this.CurrentSpiritEffect = SpiritEffect.Staminapool;
+            if (this.MaximumStamina == this.MaximumHitPoints || this.MaximumStamina > this.MaximumHitPoints)
+                this.CurrentSpiritEffect = SpiritEffect.Stamina;
             else
-                this.CurrentSpiritEffect = SpiritEffect.Manapool;*/
+                this.CurrentSpiritEffect = SpiritEffect.Health;
         }
 
+        
 
         //Eventy
-        public event EventHandler<AttackEventArgs> PhysicalAttack;
-        protected virtual void PhysicalAttacking(AttackEventArgs args)
+        public event EventHandler<AttackEventArgs> Attack;
+        protected virtual void Attacking(AttackEventArgs args)
         {
-            if (PhysicalAttack != null)
+            if (Attack != null)
             {
-                PhysicalAttack(this, args);
+                Attack(this, args);
             }
         }
 
      
         public event EventHandler<PointsEventArgs> CurrentHitPointsChange;
-        protected virtual void CurrentHitPointsChanging(PointsEventArgs args)
+        protected virtual void CurrentHitPointsChanging( double amount)
         {
+            
+            this.CurrentHitPoints += amount;
             if (CurrentHitPointsChange != null)
             {
-                CurrentHitPointsChange(this, args);
+                CurrentHitPointsChange(this, new PointsEventArgs() { MaximumPoints = this.MaximumHitPoints, CurrentPoints = this.CurrentHitPoints });
             }
         }
 
         public event EventHandler<PointsEventArgs> CurrentStaminaChange;
-        protected virtual void CurrentStaminaChanging(PointsEventArgs args)
+        protected virtual void CurrentStaminaChanging(double amount)
         {
+            this.CurrentStamina += amount;
             if (CurrentStaminaChange != null)
             {
-                CurrentStaminaChange(this, args);
+                CurrentStaminaChange(this, new PointsEventArgs() { MaximumPoints= this.MaximumStamina,CurrentPoints= this.CurrentStamina});
             }
         }
 
@@ -257,7 +253,7 @@ namespace Luky_Cviceni
         }
 
         //subscribers
-        public virtual void OnPhysicalAttack(object source, AttackEventArgs e)
+        public virtual void OnAttack(object source, AttackEventArgs e)
         {
 
         }
@@ -314,7 +310,11 @@ namespace Luky_Cviceni
 
         }
 
-
+        /// <summary>
+        /// Controls if effect should be activated or prolonged
+        /// </summary>
+        /// <param name="attackEffect">Type of atttack Effect</param>
+        /// <param name="duration">How long effect lasts</param>
         protected void Effects(AttackEffect attackEffect, int duration)
         {
             switch ((int)attackEffect)
@@ -394,6 +394,9 @@ namespace Luky_Cviceni
 
         }
 
+        /// <summary>
+        /// Checks if some effect is no longer active
+        /// </summary>
         protected void CheckForEffectReset()
         {
             if (BlindDuration == 0)

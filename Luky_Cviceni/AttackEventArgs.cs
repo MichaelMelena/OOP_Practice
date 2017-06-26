@@ -9,7 +9,7 @@ namespace Luky_Cviceni
     class AttackEventArgs : EventArgs
     {
         public double Amount { get; set; }
-        public AttackEffect AttackEffects { get; set; }
+        public AttackEffect Effect { get; set; }
         public int AttackEffectDurations {get;set;}
     }
 }

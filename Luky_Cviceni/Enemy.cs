@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 
 namespace Luky_Cviceni
 {
-    class Program
+    class Enemy:Character
     {
-        static void Main(string[] args)
-        {
-          
-        }
     }
 }

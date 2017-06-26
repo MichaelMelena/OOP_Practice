@@ -14,7 +14,14 @@ namespace Luky_Cviceni
         public int CurrentCooldown { get; set; }
         public int AbillityDuration { get; set; }
         public bool Usable { get; set; }
-        public double ResourceCost { get; set; }
+        /// <summary>
+        /// How much abillity costs in Stamina it hast to be negative value 
+        /// </summary>
+        public double StaminaCost { get; set; }
+        /// <summary>
+        ///  How much abillity costs in health it hast to be negative value 
+        /// </summary>
+        public double HealthCost { get; set; }
         public int Priority { get; set; }
         public int PriorityModifier { get; set; }
 
@@ -45,7 +52,7 @@ namespace Luky_Cviceni
         /// <param name="cooldown">amount of rounds until it can be used again</param>
         /// <param name="priority">priority number for AI</param>
         /// <param name="priorityModifier">Ai priority modifier</param>
-        public Abillity(string name, string description,double strengthModifier, double dexterityModifier,double enduranceModifier,double intelectModifier,double spirtiModifier,AttackEffect attackEffect,int duration, double cost,int cooldown,bool isPassive=false,int priority=0,int priorityModifier=0)
+        public Abillity(string name, string description,double strengthModifier, double dexterityModifier,double enduranceModifier,double intelectModifier,double spirtiModifier,AttackEffect attackEffect,int duration, double staminaCost,double healthCost,int cooldown,bool isPassive=false,int priority=0,int priorityModifier=0)
         {
             this.CurrentCooldown = 0;
             this.Name = name;
@@ -58,7 +65,8 @@ namespace Luky_Cviceni
            
             this.Effect = attackEffect;
             this.AbillityDuration = duration;
-            this.ResourceCost = cost;
+            this.StaminaCost = staminaCost;
+            this.HealthCost = healthCost;
             this.Cooldown = cooldown;
             this.IsPassive = isPassive;
             this.Priority = priority;
