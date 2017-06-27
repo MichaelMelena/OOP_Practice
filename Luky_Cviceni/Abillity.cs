@@ -6,34 +6,27 @@ using System.Threading.Tasks;
 
 namespace Luky_Cviceni
 {
-    class Abillity
+    class Abillity:ICloneable
     {
+        #region Abillity stats
         public string Name { get; set; }
         public string Description { get; set; }
         public int Cooldown { get; set; }
         public int CurrentCooldown { get; set; }
         public int AbillityDuration { get; set; }
         public bool Usable { get; set; }
-        /// <summary>
-        /// How much abillity costs in Stamina it hast to be negative value 
-        /// </summary>
         public double StaminaCost { get; set; }
-        /// <summary>
-        ///  How much abillity costs in health it hast to be negative value 
-        /// </summary>
         public double HealthCost { get; set; }
         public int Priority { get; set; }
         public int PriorityModifier { get; set; }
-
         public AttackEffect Effect { get; set; }
-      
         public bool IsPassive { get; set; }
-
         private double StrengthModifier { get; set; }
         private double DexterityModifier { get; set; }
         private double EnduranceModifier { get; set; }
         private double IntellectModifier { get; set; }
         private double SpiritModifier { get; set; }
+        #endregion
 
         /// <summary>
         /// Creates new abillity
@@ -72,8 +65,7 @@ namespace Luky_Cviceni
             this.Priority = priority;
             this.PriorityModifier = priorityModifier;
 
-        }      
-
+        }    
 
         /// <summary>
         /// Calculates damage output acording to dammage modifiers and character stats
@@ -88,6 +80,16 @@ namespace Luky_Cviceni
         public double CalculateDamage(double attackPower, double strength, double Dexterity, double endurance, double intelect, double spirit)
         {
             return (attackPower + strength * StrengthModifier + Dexterity * DexterityModifier + endurance * EnduranceModifier + intelect * IntellectModifier + spirit * SpiritModifier);
+        }
+
+        /// <summary>
+        /// Shalow clone (copies value type but reference types remain)
+        /// if reference type is added to this class DeepCLone should be used
+        /// </summary>
+        /// <returns>Shalow copy o this object</returns>
+        public object Clone()
+        {
+            return this.MemberwiseClone();
         }
 
     }

@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Luky_Cviceni
 {
-    class Enemy : Character
+    class AbillitiesEventArgs:EventArgs
     {
-        public Enemy ()
-        {
-            throw new NotImplementedException("In progress");
-        }
+        public Abillity[] Abillities { get; set; }
     }
 }

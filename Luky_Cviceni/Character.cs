@@ -13,41 +13,31 @@ namespace Luky_Cviceni
     /// </summary>
     abstract class Character
     {
-        public string Name { get; set; }
-        public int Level { get; set; }
-        public int SkillPoints { get; set; }
-        //Druhy útoků
-
         public enum SpiritEffect { Health, Stamina }
 
-        //Atributy ze ,kterých se počítají staty
+        #region Charecter Stats
+        public string Name { get; set; }
         protected double Strength { get; set; }
         protected double Dexterity { get; set; }
         protected double Endurance { get; set; }
         protected double Intellect { get; set; }
         protected double Spirit { get; set; }
+        #endregion
 
-        //Staty
+        #region Battle Stats
         protected double CurrentHitPoints { get; set; }
         protected double MaximumHitPoints { get; set; }
         protected double CurrentStamina { get; set; }
         protected double MaximumStamina { get; set; }
-
-
         protected double AttackPower { get; set; }
         protected double DefensePower { get; set; }
-
-
-
         protected double Initiative { get; set; }
         protected double AttackModifier { get; set; }
         protected double DefenseModifier { get; set; }
-
-
-
         protected SpiritEffect CurrentSpiritEffect { get; set; }
+        #endregion
 
-        //proměné effektů
+        #region Effect Variables
         protected bool IsBlinded { get; set; }
         protected int BlindDuration { get; set; }
         protected bool IsStunned { get; set; }
@@ -59,13 +49,43 @@ namespace Luky_Cviceni
         protected bool ISDebuff { get; set; }
         protected int DebuffDuration { get; set; }
         protected bool IsHealed { get; set; }
-        protected int HealDuration { get; set; }
+        protected int HealDuration { get; set; } 
+        #endregion
 
-        protected Abillity[] Abillities { get; set; }
+        protected List<Abillity> Abillities { get; set; }
 
+        /// <summary>
+        /// Constructor without any parameters
+        /// </summary>
+        public Character()
+        {
+            Strength = 1;
+            Dexterity = 1;
+            Endurance = 1;
+            Intellect = 1;
+            Spirit = 1;
+            Abillities = new List<Abillity>();
+        }
 
+        /// <summary>
+        /// Constructor that uses parameters as stats
+        /// </summary>
+        /// <param name="strength"></param>
+        /// <param name="dexterity"></param>
+        /// <param name="endurance"></param>
+        /// <param name="intelect"></param>
+        /// <param name="spirit"></param>
+        public Character(double strength, double dexterity, double endurance, double intelect, double spirit)
+        {
+            Strength = strength;
+            Dexterity = dexterity;
+            Endurance = endurance;
+            Intellect = intelect;
+            Spirit = spirit;
+            Abillities = new List<Abillity>();
+        }
 
-
+        #region Clasic Methods
         /// <summary>
         /// Calculates all the attributes
         /// </summary>
@@ -107,209 +127,6 @@ namespace Luky_Cviceni
             Console.WriteLine("--------------------------------------------------------");
         }
 
-
-
-        //Virtuální metody ,které je možno přepsat
-        /// <summary>
-        /// Contains fromula for calcutaing maximum HP
-        /// </summary>
-        protected virtual void CalculateMaximumHitPoints()
-        {
-            MaximumHitPoints = this.Endurance * 1 + this.Strength * 1;
-        }
-        /// <summary>
-        /// Contains fromula for calcutaing maximum Stamina
-        /// </summary>
-        protected virtual void CalculateMaximumStamina()
-        {
-            MaximumStamina = this.Endurance * 1 + this.Dexterity * 1 + this.Strength * 1;
-        }
-        /// <summary>
-        /// Contains fromula for calcutaing attack power
-        /// </summary>
-        protected virtual void CalculateAttackPower()
-        {
-            AttackPower = this.Strength * 1 + this.Dexterity * 1;
-        }
-        /// <summary>
-        /// Contains fromula for calcutaing defense power
-        /// </summary>
-        protected virtual void CalculateDefensePower()
-        {
-            DefensePower = this.Endurance * 1 + this.Dexterity * 1;
-        }
-        /// <summary>
-        /// Contains fromula for calcutaing initiative
-        /// </summary>
-        protected virtual void CalculateInitiative()
-        {
-            Initiative = this.Dexterity * 1 + this.Intellect * 1 + this.Spirit * 1;
-        }
-
-        /// <summary>
-        /// Decides which stat will we renewed each round-- health/stamina regeneration 
-        /// </summary>
-        protected virtual void DecideSpirtiEffect()
-        {
-            if (this.MaximumStamina == this.MaximumHitPoints || this.MaximumStamina > this.MaximumHitPoints)
-                this.CurrentSpiritEffect = SpiritEffect.Stamina;
-            else
-                this.CurrentSpiritEffect = SpiritEffect.Health;
-        }
-
-        
-
-        //Eventy
-        public event EventHandler<AttackEventArgs> Attack;
-        protected virtual void Attacking(AttackEventArgs args)
-        {
-            if (Attack != null)
-            {
-                Attack(this, args);
-            }
-        }
-
-     
-        public event EventHandler<PointsEventArgs> CurrentHitPointsChange;
-        protected virtual void CurrentHitPointsChanging( double amount)
-        {
-            
-            this.CurrentHitPoints += amount;
-            if (CurrentHitPointsChange != null)
-            {
-                CurrentHitPointsChange(this, new PointsEventArgs() { MaximumPoints = this.MaximumHitPoints, CurrentPoints = this.CurrentHitPoints });
-            }
-        }
-
-        public event EventHandler<PointsEventArgs> CurrentStaminaChange;
-        protected virtual void CurrentStaminaChanging(double amount)
-        {
-            this.CurrentStamina += amount;
-            if (CurrentStaminaChange != null)
-            {
-                CurrentStaminaChange(this, new PointsEventArgs() { MaximumPoints= this.MaximumStamina,CurrentPoints= this.CurrentStamina});
-            }
-        }
-
-       
-
-        public event EventHandler Blind;
-        protected virtual void Blinded()
-        {
-            if (Blind != null)
-            {
-                Blind(this, EventArgs.Empty);
-            }
-
-        }
-
-        public event EventHandler Stun;
-        protected virtual void Stunned()
-        {
-            if (Stun != null)
-            {
-                Stun(this, EventArgs.Empty);
-            }
-
-        }
-
-        public event EventHandler Silence;
-        protected virtual void Silenceded()
-        {
-            if (Silence != null)
-            {
-                Silence(this, EventArgs.Empty);
-            }
-
-        }
-        public event EventHandler Buff;
-        protected virtual void Buffed()
-        {
-            if (Buff != null)
-            {
-                Buff(this, EventArgs.Empty);
-            }
-
-        }
-
-        public event EventHandler Debuff;
-        protected virtual void Debuffed()
-        {
-            if (Debuff != null)
-            {
-                Debuff(this, EventArgs.Empty);
-            }
-
-        }
-
-        public event EventHandler Heal;
-        protected virtual void Healed()
-        {
-            if (Heal != null)
-            {
-                Heal(this, EventArgs.Empty);
-            }
-
-        }
-
-        //subscribers
-        public virtual void OnAttack(object source, AttackEventArgs e)
-        {
-
-        }
-       
-        public virtual void OnCurrentHitPointsChange(object source, PointsEventArgs e)
-        {
-
-        }
-        public virtual void OnCurrentStaminaChange(object source, PointsEventArgs e)
-        {
-
-        }
-      
-        public virtual void OnBlind(object source, EventArgs e)
-        {
-
-        }
-        public virtual void OnStun(object source, EventArgs e)
-        {
-
-        }
-        public virtual void OnSilence(object source, EventArgs e)
-        {
-
-        }
-        public virtual void OnBuff(object source, EventArgs e)
-        {
-
-        }
-        public virtual void OnDebuff(object source, EventArgs e)
-        {
-
-        }
-        public virtual void OnHeal(object source, EventArgs e)
-        {
-
-        }
-
-        
-
-        protected virtual void OnEndofRound(object sourece, EventArgs e)
-        {
-            BlindDuration--;
-            StunDuration--;
-            DebuffDuration--;
-            BuffDuration--;
-            SilenceDuration--;
-            HealDuration--;
-            CheckForEffectReset();
-
-        }
-        protected virtual void OnStartOfRounds(object source, EventArgs e)
-        {
-
-        }
-
         /// <summary>
         /// Controls if effect should be activated or prolonged
         /// </summary>
@@ -347,7 +164,7 @@ namespace Luky_Cviceni
                             DebuffDuration += duration;
                         else
                         {
-                            ISDebuff= true;
+                            ISDebuff = true;
                             DebuffDuration = duration;
                         }
                         break;
@@ -358,7 +175,7 @@ namespace Luky_Cviceni
                             BuffDuration += duration;
                         else
                         {
-                            IsBuffed= true;
+                            IsBuffed = true;
                             BuffDuration = duration;
                         }
                         break;
@@ -369,7 +186,7 @@ namespace Luky_Cviceni
                             SilenceDuration += duration;
                         else
                         {
-                            IsSilenced= true;
+                            IsSilenced = true;
                             SilenceDuration = duration;
                         }
                         break;
@@ -377,10 +194,10 @@ namespace Luky_Cviceni
                 case 5:
                     {
                         if (IsHealed)
-                            HealDuration+= duration;
+                            HealDuration += duration;
                         else
                         {
-                            IsHealed= true;
+                            IsHealed = true;
                             HealDuration = duration;
                         }
                         break;
@@ -412,7 +229,333 @@ namespace Luky_Cviceni
             if (HealDuration == 0)
                 IsHealed = false;
         }
-       
+
+        #region Virtual Methods
+        /// <summary>
+        /// Contains fromula for calcutaing maximum HP
+        /// </summary>
+        protected virtual void CalculateMaximumHitPoints()
+        {
+            MaximumHitPoints = this.Endurance * 1 + this.Strength * 1;
+        }
+        /// <summary>
+        /// Contains fromula for calcutaing maximum Stamina
+        /// </summary>
+        protected virtual void CalculateMaximumStamina()
+        {
+            MaximumStamina = this.Endurance * 1 + this.Dexterity * 1 + this.Strength * 1;
+        }
+        /// <summary>
+        /// Contains fromula for calcutaing attack power
+        /// </summary>
+        protected virtual void CalculateAttackPower()
+        {
+            AttackPower = this.Strength * 1 + this.Dexterity * 1;
+        }
+        /// <summary>
+        /// Contains fromula for calcutaing defense power
+        /// </summary>
+        protected virtual void CalculateDefensePower()
+        {
+            DefensePower = this.Endurance * 1 + this.Dexterity * 1;
+        }
+        /// <summary>
+        /// Contains fromula for calcutaing initiative
+        /// </summary>
+        protected virtual void CalculateInitiative()
+        {
+            Initiative = this.Dexterity * 1 + this.Intellect * 1 + this.Spirit * 1;
+        }
+        #endregion
+
+        /// <summary>
+        /// Decides which stat will we renewed each round-- health/stamina regeneration 
+        /// </summary>
+        protected virtual void DecideSpirtiEffect()
+        {
+            if (this.MaximumStamina == this.MaximumHitPoints || this.MaximumStamina > this.MaximumHitPoints)
+                this.CurrentSpiritEffect = SpiritEffect.Stamina;
+            else
+                this.CurrentSpiritEffect = SpiritEffect.Health;
+        }
+        #endregion
+
+        #region Events
+
+        #region Stat Events
+        /// <summary>
+        /// Event: When character attacks
+        /// </summary>
+        public event EventHandler<AttackEventArgs> Attack;
+        /// <summary>
+        /// Triggers Attack event
+        /// </summary>
+        /// <param name="args">parameters of the attack</param>
+        protected virtual void Attacking(AttackEventArgs args)
+        {
+            if (Attack != null)
+            {
+                Attack(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Event: when character hitpoints changes
+        /// </summary>
+        public event EventHandler<PointsEventArgs> HitPointsChange;
+        /// <summary>
+        /// Triggers HitPointsChanged event and changes hitpoints
+        /// </summary>
+        /// <param name="amount"> number determining hitpoins change</param>
+        protected virtual void CurrentHitPointsChanging( double amount)
+        {
+            
+            this.CurrentHitPoints += amount;
+            if (HitPointsChange != null)
+            {
+                HitPointsChange(this, new PointsEventArgs() { MaximumPoints = this.MaximumHitPoints, CurrentPoints = this.CurrentHitPoints });
+            }
+        }
+
+        /// <summary>
+        /// Event: when character stamina changes
+        /// </summary>
+        public event EventHandler<PointsEventArgs> StaminaChange;
+        /// <summary>
+        /// Triggers StaminaChange and also changes stamina
+        /// </summary>
+        /// <param name="amount">number determining how much stamina will change</param>
+        protected virtual void CurrentStaminaChanging(double amount)
+        {
+            this.CurrentStamina += amount;
+            if (StaminaChange != null)
+            {
+                StaminaChange(this, new PointsEventArgs() { MaximumPoints= this.MaximumStamina,CurrentPoints= this.CurrentStamina});
+            }
+        }
+        #endregion
+
+        #region Effect Events
+
+        /// <summary>
+        /// Event: when character is blinded
+        /// </summary>
+        public event EventHandler Blind;
+        /// <summary>
+        /// Triiggers Blind Event
+        /// </summary>
+        protected virtual void Blinded()
+        {
+            if (Blind != null)
+            {
+                Blind(this, EventArgs.Empty);
+            }
+
+        }
+
+        /// <summary>
+        /// Event: when character i stuned
+        /// </summary>
+        public event EventHandler Stun;
+        /// <summary>
+        /// Triggers stun event
+        /// </summary>
+        protected virtual void Stunned()
+        {
+            if (Stun != null)
+            {
+                Stun(this, EventArgs.Empty);
+            }
+
+        }
+
+        /// <summary>
+        /// Event: When character is Silenced
+        /// </summary>
+        public event EventHandler Silence;
+        /// <summary>
+        /// Triggers Silence Event
+        /// </summary>
+        protected virtual void Silenceded()
+        {
+            if (Silence != null)
+            {
+                Silence(this, EventArgs.Empty);
+            }
+
+        }
+
+        /// <summary>
+        /// Event: when character is Buffed
+        /// </summary>
+        public event EventHandler Buff;
+        /// <summary>
+        /// Triggers Buff Event
+        /// </summary>
+        protected virtual void Buffed()
+        {
+            if (Buff != null)
+            {
+                Buff(this, EventArgs.Empty);
+            }
+
+        }
+
+        /// <summary>
+        /// Event: when character is Debufed
+        /// </summary>
+        public event EventHandler Debuff;
+        /// <summary>
+        /// Triggers Debuff event
+        /// </summary>
+        protected virtual void Debuffed()
+        {
+            if (Debuff != null)
+            {
+                Debuff(this, EventArgs.Empty);
+            }
+
+        }
+
+        /// <summary>
+        /// Event: when character is Healed
+        /// </summary>
+        public event EventHandler Heal;
+        /// <summary>
+        /// Triggers Heal Event
+        /// </summary>
+        protected virtual void Healed()
+        {
+            if (Heal != null)
+            {
+                Heal(this, EventArgs.Empty);
+            }
+
+        }
+        #endregion
+
+        #endregion
+
+        #region Subscribers
+        #region Effect Subscibers
+        /// <summary>
+        /// reacts on Enemy attack Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnAttack(object source, AttackEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// reacts on Enemy HitPointsChange Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnHitPointsChange(object source, PointsEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// reacts on Enemy StaminaChange Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnStaminaChange(object source, PointsEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// reacts on Enemy Blind Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnBlind(object source, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// reacts on Enemy Stun Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnStun(object source, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// reacts on Enemy Silence Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnSilence(object source, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// reacts on Enemy Buff Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnBuff(object source, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// reacts on Enemy Debuff Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnDebuff(object source, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// reacts on Enemy Heal Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnHeal(object source, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        /// <summary>
+        /// Reacts arenas object end of the round
+        /// </summary>
+        /// <param name="sourece"></param>
+        /// <param name="e"></param>
+        protected virtual void OnEndofRound(object sourece, EventArgs e)
+        {
+            BlindDuration--;
+            StunDuration--;
+            DebuffDuration--;
+            BuffDuration--;
+            SilenceDuration--;
+            HealDuration--;
+            CheckForEffectReset();
+
+        }
+
+        /// <summary>
+        /// Reacts arenas object start of the round
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        protected virtual void OnStartOfRounds(object source, EventArgs e)
+        {
+
+        }
+        #endregion
 
     }
 }

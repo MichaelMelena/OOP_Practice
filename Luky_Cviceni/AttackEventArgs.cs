@@ -10,6 +10,6 @@ namespace Luky_Cviceni
     {
         public double Amount { get; set; }
         public AttackEffect Effect { get; set; }
-        public int AttackEffectDurations {get;set;}
+        public int AttackEffectDuration {get;set;}
     }
 }
