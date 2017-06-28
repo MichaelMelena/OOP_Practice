@@ -21,6 +21,8 @@ namespace Luky_Cviceni
         {
             SetFirstLevel();
             NameYourCharacter();
+            AttackModifier = 1;
+            DefenseModifier = 1;
 
         }
 
@@ -36,6 +38,8 @@ namespace Luky_Cviceni
         {
             SetFirstLevel();
             NameYourCharacter();
+            AttackModifier = 1;
+            DefenseModifier = 1;
         }
 
         /// <summary>
@@ -49,6 +53,11 @@ namespace Luky_Cviceni
 
         }
 
+        public  void PlayRound()
+        {
+            ChooseAction();   
+        }
+
         /// <summary>
         /// ask player for name and sets it to the character
         /// </summary>
@@ -56,6 +65,7 @@ namespace Luky_Cviceni
         {
             Console.WriteLine("Write a name for your character");
             this.Name = TypeHere();
+            DoLine();
         }
 
         /// <summary>
@@ -64,6 +74,7 @@ namespace Luky_Cviceni
         protected void OfferAbillities()// tohle se da predelat pomoci linq
         {
             CheckAbillities();
+            DoLine();
             Console.WriteLine("Abillities");
             for (int i = 0; i < Abillities.Count; i++)
             {
@@ -75,7 +86,7 @@ namespace Luky_Cviceni
             DoLine();
 
         }
-       
+
         /// <summary>
         /// uses method OfferAbillities and uses player chosen abillity
         /// </summary>
@@ -87,32 +98,34 @@ namespace Luky_Cviceni
             while (chosenOption.ToUpper() != "Q")
             {
                 OfferAbillities();
-                Console.WriteLine("Choose a attack or type Q to skip your turn");
+                Console.WriteLine("Choose an attack or type Q to skip your turn");
 
-              parseResult =  int.TryParse(Console.ReadLine(), out abillityIndex);
-                if (parseResult&& abillityIndex< Abillities.Count)
+                parseResult = int.TryParse(Console.ReadLine(), out abillityIndex);
+                if (parseResult && abillityIndex < Abillities.Count)
                 {
                     double damage = Abillities[abillityIndex].CalculateDamage(this.AttackPower, this.Strength, this.Dexterity, this.Endurance, this.Intellect, this.Spirit);
-                    CurrentStaminaChanging( Abillities[abillityIndex].StaminaCost);
-                    CurrentHitPointsChanging(  Abillities[abillityIndex].HealthCost);
-                    Attacking(new AttackEventArgs() { Amount = damage*AttackModifier, Effect = Abillities[abillityIndex].Effect, AttackEffectDuration = Abillities[abillityIndex].AbillityDuration });
+                    StaminaChanging(Abillities[abillityIndex].StaminaCost);
+                    HitPointsChanging(Abillities[abillityIndex].HealthCost);
+                         DoLine();
+                    Attacking(new AttackEventArgs() { Amount = damage * AttackModifier, Effect = Abillities[abillityIndex].Effect, AttackEffectDuration = Abillities[abillityIndex].AbillityDuration });
                     break;
                 }
-               
+
             }
+           
 
         }
 
         /// <summary>
         /// Sets new milestone for level up
         /// </summary>
-        protected  void SetKillMilestone()
+        protected void SetKillMilestone()
         {
-            if(Level <= 5)
+            if (Level <= 5)
             {
                 Milestone += Level;
             }
-            else if (Level <=10)
+            else if (Level <= 10)
             {
                 Milestone += 8;
             }
@@ -127,12 +140,12 @@ namespace Luky_Cviceni
         /// </summary>
         protected void CheckLevel()
         {
-            if(KillCount == Milestone)
+            if (KillCount == Milestone)
             {
                 Level++;
                 SkillPoints += AmountOfSkillPoints();
                 SetKillMilestone();
-                if(Level %2==0)
+                if (Level % 2 == 0)
                 {
                     //vyber abillitu
                 }
@@ -145,13 +158,13 @@ namespace Luky_Cviceni
         /// <returns>Number of skill points</returns>
         protected int AmountOfSkillPoints()
         {
-            if (Level <=5)
+            if (Level <= 5)
                 return 1;
             else if (Level <= 10)
                 return 2;
             else if (10 < Level)
                 return 3;
-            else return 0;  
+            else return 0;
         }
 
         /// <summary>
@@ -162,10 +175,10 @@ namespace Luky_Cviceni
             for (int i = 0; i < SkillPoints; i++)
             {
                 DoLine();
-                Console.WriteLine(string.Format("Level: {8} {0} Health: {1} {0} Stamina: {2} {0} Strength: {3} {0} Dexterity: {4} {0} Endurance: {5} {0} Intelect: {6} {0} Spirit: {7} ",Environment.NewLine,MaximumHitPoints,MaximumStamina,Strength,Dexterity,Endurance,Intellect,Spirit,Level));
-                Console.WriteLine("Choose which stat you wish to increase"+Environment.NewLine + " s = Strength | d = Dexterity | e = Endurance | i = Intelect | p = Spirit");
+                Console.WriteLine(string.Format("Level: {8} {0} Health: {1} {0} Stamina: {2} {0} Strength: {3} {0} Dexterity: {4} {0} Endurance: {5} {0} Intelect: {6} {0} Spirit: {7} ", Environment.NewLine, MaximumHitPoints, MaximumStamina, Strength, Dexterity, Endurance, Intellect, Spirit, Level));
+                Console.WriteLine("Choose which stat you wish to increase" + Environment.NewLine + " s = Strength | d = Dexterity | e = Endurance | i = Intelect | p = Spirit");
                 string val = Console.ReadLine().ToLower();
-                switch(val)
+                switch (val)
                 {
                     case "s":
                         {
@@ -204,8 +217,9 @@ namespace Luky_Cviceni
         protected string TypeHere()
         {
             Console.Write("Type here:");
-          return Console.ReadLine();
-            
+            return Console.ReadLine();
+           
+
         }
 
         /// <summary>
@@ -213,11 +227,18 @@ namespace Luky_Cviceni
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        protected virtual void OnVictory(object source, EventArgs e)
+        public override void OnDefeat(object source, EventArgs e)
         {
-            KillCount++;
-            CheckLevel();
+           
         }
+
+        /// <summary>
+        /// Reacts to Defeat Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        
+      
 
         /// <summary>
         /// Massage displayed when player attacks
@@ -225,7 +246,7 @@ namespace Luky_Cviceni
         /// <param name="args">Atributes of attack</param>
         protected virtual void AttackMessage(AttackEventArgs args)
         {
-            Console.WriteLine(string.Format("(PLAYER) {0} Attacks for: {1}. attack causes: {2} for {3} rounds",this.Name,Math.Round(args.Amount) ,args.Effect,args.AttackEffectDuration ));
+            Console.WriteLine(string.Format("(PLAYER) --{0}-- with {1} Hitpoints and {2} Stamina{3}Attacks for: {4} attack causes: {5} for {6} rounds",this.Name,this.CurrentHitPoints,CurrentStamina,Environment.NewLine,Math.Round(args.Amount) ,args.Effect,args.AttackEffectDuration ));
         }
 
         /// <summary>
@@ -235,18 +256,47 @@ namespace Luky_Cviceni
         /// <returns>String which contains formated information about abillity</returns>
         protected string AbillityInfoPrint(Abillity abillity)
         {
-            return string.Format("{0} === {1}  Cost: {2} Effect: {3} Duration: {4} Cooldown: {5}", abillity.Name.ToUpper(), abillity.Description, abillity.StaminaCost, abillity.Effect, abillity.AbillityDuration, abillity.Cooldown);
+            return string.Format("|{0} === {1}|Stamina Cost: {2}|Health Cost: {3}|Effect: {4}|Duration: {5}|Cooldown: {6}|", abillity.Name.ToUpper(), abillity.Description, abillity.StaminaCost,abillity.HealthCost, abillity.Effect, abillity.AbillityDuration, abillity.Cooldown);
         }
 
          /// <summary>
          /// method that raises Attack event and writes message with info about attack
          /// </summary>
          /// <param name="args">atributes of the attack</param>
-        protected override void Attacking(AttackEventArgs args)
+     
+
+        /// <summary>
+        /// reacts to arena event that offers player abillities
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnAbillityOffer(object source, AbillitiesEventArgs e)
         {
-            AttackMessage(args);
-            base.Attacking(args);
+            int abillityIndex = 0;
+            bool parseResult = false;
+            bool abillityAdded = false;
+            while (!abillityAdded)
+            { 
+                for (int i = 0; i < e.ListOfAbillities.Count; i++)
+                {
+                    Console.WriteLine(i + " : " + AbillityInfoPrint(e.ListOfAbillities[i]));
+                }
+                Console.WriteLine("Write the number of the abillity you wish to learn and press Enter");
+            parseResult = int.TryParse(Console.ReadLine(), out abillityIndex);
+            if (parseResult && abillityIndex < e.ListOfAbillities.Count)
+            {
+                this.Abillities.Add((Abillity)e.ListOfAbillities[abillityIndex].Clone());
+                    abillityAdded = true;
+            }
+            else
+            {
+                Console.WriteLine("Something went Wrong pick again");
+            }
+            }
         }
+
+
+        #region Overriden
 
         /// <summary>
         /// Reacts on oponents attack (Defense)
@@ -258,50 +308,49 @@ namespace Luky_Cviceni
 
             if (e.Amount == this.DefensePower * DefenseModifier)
             {
-                Console.WriteLine(string.Format("(Player) {0} barely doged Oponents attack but was affected by its effect", this.Name));
                 Effects(e.Effect, e.AttackEffectDuration);
+                Console.WriteLine(string.Format("(ThePlayer) {0} barely doged Oponents attack but was affected by its effect", this.Name));
+               
+
             }
             else if (e.Amount > this.DefensePower * DefenseModifier)
             {
-                Console.WriteLine(string.Format("(Player) {0} was hitby oponents attack", this.Name));
+                Console.WriteLine(string.Format("(ThePlayer) {0} was hitby oponents attack", this.Name));
                 Effects(e.Effect, e.AttackEffectDuration);
+                HitPointsChanging((DefensePower * DefenseModifier) - e.Amount);
             }
             else if (e.Amount < this.DefensePower * DefenseModifier)
             {
-                Console.WriteLine(string.Format("(Player) {0} doged oponents attack", this.Name));
+                Console.WriteLine(string.Format("(ThePlayer) {0} doged oponents attack", this.Name));
             }
         }
 
-        /// <summary>
-        /// reacts to arena event that offers player abillities
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="e"></param>
-        public virtual void OnAbillitiesOffer(object source, AbillitiesEventArgs e)
+        protected override void Attacking(AttackEventArgs args)
         {
-            int abillityIndex = 0;
-            bool parseResult = false;
-            bool abillityAdded = false;
-            while (abillityAdded)
-            { 
-                for (int i = 0; i < e.Abillities.Length; i++)
-                {
-                    Console.WriteLine(i + " : " + AbillityInfoPrint(e.Abillities[i]));
-                }
-                Console.WriteLine("Write the number of the abillity you wish to learn and press Enter");
-            parseResult = int.TryParse(Console.ReadLine(), out abillityIndex);
-            if (parseResult && abillityIndex < e.Abillities.Length)
-            {
-                this.Abillities.Add((Abillity)e.Abillities[abillityIndex].Clone());
-                abillityAdded = true;
-            }
-            else
-            {
-                Console.WriteLine("Something went Wrong pick again");
-            }
-            }
+            AttackMessage(args);
+            base.Attacking(args);
         }
 
+        protected override void Won()
+        {
+            KillCount++;
+            CheckLevel();
+            base.Won();
+        }
+
+        public override void OnHitPointsChange(object source, PointsEventArgs e)
+        {
+
+            Console.WriteLine("Enemy has: " + e.CurrentPoints + "HP");
+
+        }
+        public override void OnStaminaChange(object source, PointsEventArgs e)
+        {
+            Console.WriteLine("Enemy has:" + e.CurrentPoints + "");
+        }
+        #endregion
+
+        #region Events
         /// <summary>
         /// Event that triggers when player levels up
         /// </summary>
@@ -312,12 +361,13 @@ namespace Luky_Cviceni
         /// </summary>
         protected virtual void LevelingUp()
         {
-            if(LevelUp!=null)
+            if (LevelUp != null)
             {
                 LevelUp(this, EventArgs.Empty);
             }
         }
 
+        #endregion
 
     }
 }

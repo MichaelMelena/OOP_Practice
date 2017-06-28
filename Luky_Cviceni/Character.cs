@@ -49,7 +49,7 @@ namespace Luky_Cviceni
         protected bool ISDebuff { get; set; }
         protected int DebuffDuration { get; set; }
         protected bool IsHealed { get; set; }
-        protected int HealDuration { get; set; } 
+        protected int HealDuration { get; set; }
         #endregion
 
         protected List<Abillity> Abillities { get; set; }
@@ -65,6 +65,7 @@ namespace Luky_Cviceni
             Intellect = 1;
             Spirit = 1;
             Abillities = new List<Abillity>();
+            CalculateAll();
         }
 
         /// <summary>
@@ -83,6 +84,7 @@ namespace Luky_Cviceni
             Intellect = intelect;
             Spirit = spirit;
             Abillities = new List<Abillity>();
+            CalculateAll();
         }
 
         #region Clasic Methods
@@ -92,7 +94,6 @@ namespace Luky_Cviceni
         protected void CalculateAll()
         {
             CalculateMaximumHitPoints();
-            CalculateMaximumStamina();
             CalculateMaximumStamina();
             CalculateAttackPower();
             CalculateDefensePower();
@@ -237,6 +238,7 @@ namespace Luky_Cviceni
         protected virtual void CalculateMaximumHitPoints()
         {
             MaximumHitPoints = this.Endurance * 1 + this.Strength * 1;
+            CurrentHitPoints = MaximumHitPoints;
         }
         /// <summary>
         /// Contains fromula for calcutaing maximum Stamina
@@ -244,6 +246,7 @@ namespace Luky_Cviceni
         protected virtual void CalculateMaximumStamina()
         {
             MaximumStamina = this.Endurance * 1 + this.Dexterity * 1 + this.Strength * 1;
+            CurrentStamina = MaximumStamina;
         }
         /// <summary>
         /// Contains fromula for calcutaing attack power
@@ -298,6 +301,15 @@ namespace Luky_Cviceni
                 Attack(this, args);
             }
         }
+        public event EventHandler Victory;
+        protected virtual void Won()
+        {
+            if (Victory != null)
+            {
+                Victory(this, EventArgs.Empty);
+            }
+        }
+
 
         /// <summary>
         /// Event: when character hitpoints changes
@@ -307,13 +319,21 @@ namespace Luky_Cviceni
         /// Triggers HitPointsChanged event and changes hitpoints
         /// </summary>
         /// <param name="amount"> number determining hitpoins change</param>
-        protected virtual void CurrentHitPointsChanging( double amount)
+        protected virtual void HitPointsChanging(double amount)
         {
-            
-            this.CurrentHitPoints += amount;
+
+            if ((this.CurrentHitPoints+amount)<=MaximumHitPoints)
+            {
+                this.CurrentHitPoints += amount;
+            }
+           
             if (HitPointsChange != null)
             {
                 HitPointsChange(this, new PointsEventArgs() { MaximumPoints = this.MaximumHitPoints, CurrentPoints = this.CurrentHitPoints });
+                if(CurrentHitPoints<=0)
+                {
+                    Won();
+                }
             }
         }
 
@@ -325,14 +345,21 @@ namespace Luky_Cviceni
         /// Triggers StaminaChange and also changes stamina
         /// </summary>
         /// <param name="amount">number determining how much stamina will change</param>
-        protected virtual void CurrentStaminaChanging(double amount)
+        protected virtual void StaminaChanging(double amount)
         {
-            this.CurrentStamina += amount;
+            if((CurrentStamina+amount)<=MaximumStamina)
+            {
+                this.CurrentStamina += amount;
+            }
+            
             if (StaminaChange != null)
             {
-                StaminaChange(this, new PointsEventArgs() { MaximumPoints= this.MaximumStamina,CurrentPoints= this.CurrentStamina});
+                StaminaChange(this, new PointsEventArgs() { MaximumPoints = this.MaximumStamina, CurrentPoints = this.CurrentStamina });
+                
             }
         }
+
+
         #endregion
 
         #region Effect Events
@@ -449,6 +476,19 @@ namespace Luky_Cviceni
         }
 
         /// <summary>
+        /// Reacts to Victory Event
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public virtual void OnDefeat(object source, EventArgs e)
+        {
+
+        }
+
+        
+       
+
+        /// <summary>
         /// reacts on Enemy HitPointsChange Event
         /// </summary>
         /// <param name="source"></param>
@@ -534,7 +574,9 @@ namespace Luky_Cviceni
         /// </summary>
         /// <param name="sourece"></param>
         /// <param name="e"></param>
-        protected virtual void OnEndofRound(object sourece, EventArgs e)
+
+
+        public virtual void OnEndofRound(object sourece, EventArgs e)
         {
             BlindDuration--;
             StunDuration--;
@@ -551,7 +593,7 @@ namespace Luky_Cviceni
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        protected virtual void OnStartOfRounds(object source, EventArgs e)
+        public virtual void OnStartOfRound(object source, EventArgs e)
         {
 
         }

@@ -45,8 +45,10 @@
   <ItemGroup>
     <Compile Include="AbillitiesEventArgs.cs" />
     <Compile Include="Abillity.cs" />
+    <Compile Include="Arena.cs" />
     <Compile Include="AttackEventArgs.cs" />
     <Compile Include="Character.cs" />
+    <Compile Include="Dummy.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PointsEventArgs.cs" />

@@ -8,6 +8,6 @@ namespace Luky_Cviceni
 {
     class AbillitiesEventArgs:EventArgs
     {
-        public Abillity[] Abillities { get; set; }
+        public List<Abillity> ListOfAbillities{ get; set; }
     }
 }
